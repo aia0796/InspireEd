@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Decentralized Education Funding Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <a href="home.html">InspireEd</a>
+      </div>
+      <nav>
+        <a href="submit.html">Submit a Project</a>
+        <a href="explore.html">Explore Projects</a>
+        <button
+          id="connectButton"
+          class="connect-wallet"
+          onclick="connectWallet()"
+        >
+          Connect Wallet
+        </button>
+      </nav>
+    </header>
+
+    <section class="main-banner">
+      <h1>Empowering the Future of Education</h1>
+      <p>
+        Join our platform to fund and support educational projects worldwide.
+      </p>
+      <a href="explore.html" class="cta-button">Explore Projects</a>
+    </section>
+
+    <section class="key-features">
+      <h2>Why Choose Us?</h2>
+      <div class="features-grid">
+        <div class="feature">
+          <h3>Decentralized Funding</h3>
+          <p>Secure and transparent funding for educational initiatives.</p>
+        </div>
+        <div class="feature">
+          <h3>Community Driven</h3>
+          <p>Support and connect with like-minded individuals.</p>
+        </div>
+        <div class="feature">
+          <h3>Innovative Projects</h3>
+          <p>Discover cutting-edge projects that are changing education.</p>
+        </div>
+      </div>
+    </section>
+ <!-- Chat Button -->
+ <button id="chatBtn" class="chat-btn">Chat with us</button>
+
+ <!-- Chat Popup -->
+ <div id="chatPopup" class="chat-popup">
+     <div class="chat-header">
+         <span>Chatbot</span>
+         <button id="closeChat" class="close-btn">&times;</button>
+     </div>
+     <div class="chat-body" id="chatBody">
+         <div class="bot-message">Hello! How can I help you?</div>
+     </div>
+     <div class="chat-footer">
+         <input type="text" id="userMessage" placeholder="Type your message here..." />
+         <button id="sendMessage">Send</button>
+     </div>
+ </div>
+    <footer>
+      <p>&copy; 2024 InspireEd. All rights reserved.</p>
+    </footer>
+
+    <script>
+      let provider;
+
+      // window.addEventListener('load', () => {
+      // Check if MetaMask is installed
+
+      // });
+
+      async function connectWallet() {
+        try {
+          if (typeof window.ethereum !== "undefined") {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // Optionally check if the wallet is already connected
+            window.ethereum
+              .request({ method: "eth_accounts" })
+              .then((accounts) => {
+                if (accounts.length > 0) {
+                  document.getElementById("connectButton").innerText =
+                    "Connected";
+                  localStorage.setItem("clientAddress", accounts[0]);
+                  console.log("Wallet is already connected:", accounts[0]);
+                }
+              })
+              .catch((err) => {
+                console.error("Error checking wallet connection:", err);
+              });
+          } else {
+            console.error("MetaMask is not installed!");
+          }
+
+          // Request connection to MetaMask only when the button is clicked
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+
+          // Get the connected wallet's signer
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          // Update button text to "Connected"
+          document.getElementById("connectButton").innerText = "Connected";
+
+          // Store the connected address in localStorage
+          localStorage.setItem("clientAddress", address);
+
+          console.log("Connected wallet address:", address);
+        } catch (error) {
+          console.error("Error connecting to MetaMask:", error);
+        }
+      }
+      // Ensure the script only runs after the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Toggle chat popup display
+    const chatBtn = document.getElementById('chatBtn');
+    const chatPopup = document.getElementById('chatPopup');
+    const closeChat = document.getElementById('closeChat');
+
+    // Show the popup when the chat button is clicked
+    chatBtn.addEventListener('click', () => {
+        chatPopup.style.display = 'flex';
+    });
+
+    // Hide the popup when the close button is clicked
+    closeChat.addEventListener('click', () => {
+        chatPopup.style.display = 'none';
+    });
+
+    // Handle sending messages
+    const sendMessageBtn = document.getElementById('sendMessage');
+    const chatBody = document.getElementById('chatBody');
+    const userMessageInput = document.getElementById('userMessage');
+
+    sendMessageBtn.addEventListener('click',async () => {
+      const userMessage = userMessageInput.value;
+  if (userMessage) {
+    const response = await fetch('http://127.0.0.1:8000/chat_gen', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt: userMessage }), // Use the inputText as prompt
+    });
+    const data = await response.json();
+    console.log(data.ans, "===================");
+
+    appendMessage('user', userMessage);
+    setTimeout(() => {
+
+      appendMessage('bot', ` ${data.ans}`);
+    }, 1000);
+    userMessageInput.value = '';
+  }
+    });
+
+    // Function to append messages to chat
+    function appendMessage(sender, message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(sender === 'bot' ? 'bot-message' : 'user-message');
+        messageDiv.textContent = message;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight; // Scroll to bottom
+    }
+});
+
+    </script>
+  </body>
+</html>

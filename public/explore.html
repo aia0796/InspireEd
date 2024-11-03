@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore Projects</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">InspireEd</div>
+      <nav>
+        <a href="home.html">Home</a>
+        <a href="submit.html">Submit a Project</a>
+        <a href="explore.html">Explore Projects</a>
+        <button class="connect-wallet" onclick="connectWallet()">
+          Connect Wallet
+        </button>
+      </nav>
+    </header>
+
+    <section class="project-listing">
+      <h2>Explore Educational Projects</h2>
+
+      <div class="project">
+        <h3>Project Title: BounceVerse</h3>
+        <p>Category: Gaming, Blockchain</p>
+        <p>Technology: Built on AIA chain, utilizing Web3 principles for decentralized ownership and gameplay mechanics.</p>
+        <p>Description: BounceVerse is a groundbreaking Web3 gaming adventure that invites players to engage in a colorful, interactive environment where they catch tokens by navigating obstacles and completing challenges. Players can earn in-game assets that are tradable on the blockchain, creating a new economy within the game.</p>
+        <p>Project Related Links: <a href="https://www.bounceverse.com">Official Website</a>, <a href="https://twitter.com/bounceverse">Twitter</a>, <a href="https://medium.com/bounceverse">Medium Blog</a></p>
+        <p>Funding Target: $250,000</p>
+        <p>Timeline: Development Phase (Q1 2024), Beta Launch (Q3 2024), Full Release (Q1 2025)</p>
+        <p>Team Information: Our team consists of experienced game developers, blockchain experts, and community builders with backgrounds in AAA gaming, crypto economics, and player engagement strategies. Together, we aim to create an engaging and rewarding experience for our players.</p>
+        <p>Wallet Address: 0x1234567890abcdef1234567890abcdef12345678</p>
+        <button
+          class="invest-button"
+          onclick="openInvestPopup('BounceVerse')"
+        >
+          Invest
+        </button>
+    </div>
+
+    <div class="project">
+      <h3>Project Title: The Impact of Blockchain Technology on Supply Chain Transparency</h3>
+      <p>Category: Blockchain Research, Supply Chain Management</p>
+      <p>Technology: This research will explore various blockchain technologies, including Ethereum and Hyperledger, focusing on their applications in enhancing transparency, traceability, and accountability within supply chains.</p>
+      <p>Description: This study aims to investigate how blockchain technology can transform supply chain management by improving transparency and reducing fraud. By analyzing case studies from various industries, the research will evaluate the effectiveness of blockchain in providing real-time data access to all stakeholders, thus fostering trust and collaboration. The findings are expected to contribute to best practices for implementing blockchain solutions in supply chains.</p>
+      <p>Project Related Links: <a href="https://www.example-research.org">Research Website</a>, <a href="https://twitter.com/scholar">Twitter</a>, <a href="https://www.example-research.org/publications">Publications</a></p>
+      <p>Funding Target: $150,000, aimed at covering research costs, data acquisition, and dissemination of findings through conferences and publications.</p>
+      <p>Timeline: 
+          <ul>
+              <li>Literature Review: Q1 2024</li>
+              <li>Data Collection: Q2 2024</li>
+              <li>Analysis and Findings: Q3 2024</li>
+              <li>Publication and Dissemination: Q4 2024</li>
+          </ul>
+      </p>
+      <p>Team Information: The research team consists of experts in blockchain technology, supply chain management, and data analytics, with a strong background in conducting interdisciplinary studies. Collaboration with industry partners will enhance the practical relevance of the research.</p>
+      <p>Contact Information: [Insert contact email or form link]</p>
+      <button
+        class="invest-button"
+        onclick="openInvestPopup('Blockchain Research')"
+      >
+        Support Research
+      </button>
+  </div>
+  
+    </section>
+
+    <div id="invest-popup" class="popup">
+      <div class="popup-content">
+        <span class="close-button" onclick="closeInvestPopup()">&times;</span>
+        <h3 id="project-title">Invest in Project</h3>
+        <label for="invest-amount"></label>
+        <input
+          type="number"
+          id="invest-amount"
+          placeholder="Enter amount to invest"
+        />
+        <button onclick="sendInvestment()">Send Investment</button>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 InspireEd. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+    <script>
+      window.onload = async () => {
+        console.log("OSAKA");
+        // await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        // Get the connected wallet's signer
+        //   const signer = provider.getSigner();
+        //   const address = await signer.getAddress();
+
+        // Update button text to "Connected"
+        const clientAddress = localStorage.getItem("clientAddress");
+        if (clientAddress) {
+          document.querySelector(".connect-wallet").innerText = "Connected";
+        }
+      };
+      async function connectWallet() {
+        try {
+          if (typeof window.ethereum !== "undefined") {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            // Optionally check if the wallet is already connected
+            window.ethereum
+              .request({ method: "eth_accounts" })
+              .then((accounts) => {
+                if (accounts.length > 0) {
+                  document.getElementById("connectButton").innerText =
+                    "Connected";
+                  localStorage.setItem("clientAddress", accounts[0]);
+                  console.log("Wallet is already connected:", accounts[0]);
+                }
+              })
+              .catch((err) => {
+                console.error("Error checking wallet connection:", err);
+              });
+          } else {
+            console.error("MetaMask is not installed!");
+          }
+
+          // Request connection to MetaMask only when the button is clicked
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+
+          // Get the connected wallet's signer
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          // Update button text to "Connected"
+          document.getElementById("connectButton").innerText = "Connected";
+
+          // Store the connected address in localStorage
+          localStorage.setItem("clientAddress", address);
+
+          console.log("Connected wallet address:", address);
+        } catch (error) {
+          console.error("Error connecting to MetaMask:", error);
+        }
+      }
+
+      const sendInvestment = () => {
+        const amountEle = document.getElementById("invest-amount");
+        const clientAddress = localStorage.getItem("clientAddress");
+        console.log(clientAddress, amountEle.value);
+        deposit(amountEle.value)
+        fetch("/withdraw", {
+          method: "POST", // Specify the method as POST
+          headers: {
+            "Content-Type": "application/json", // Set the content type to JSON if you're sending JSON data
+          },
+          body: JSON.stringify({
+            clientAddress,
+            claimAmt: amountEle.value,
+          }),
+        })
+          .then((res) => {
+            res.json();
+          })
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
+    </script>
+  </body>
+</html>
